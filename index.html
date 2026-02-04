@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-chart-pie"></i>
+                    <span class="logo-text">Expense<span class="logo-highlight">Tracker</span></span>
+                </div>
+                <div class="current-date">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span id="current-date">Loading...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="app-content">
+            <!-- Summary Cards -->
+            <section class="summary-section">
+                <div class="summary-card balance">
+                    <div class="card-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="card-content">
+                        <p class="card-label">Total Balance</p>
+                        <h2 id="total-balance">$0.00</h2>
+                    </div>
+                </div>
+                
+                <div class="summary-card income">
+                    <div class="card-icon">
+                        <i class="fas fa-arrow-up"></i>
+                    </div>
+                    <div class="card-content">
+                        <p class="card-label">Total Income</p>
+                        <h2 id="total-income">$0.00</h2>
+                    </div>
+                </div>
+                
+                <div class="summary-card expense">
+                    <div class="card-icon">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+                    <div class="card-content">
+                        <p class="card-label">Total Expense</p>
+                        <h2 id="total-expense">$0.00</h2>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Form and Controls -->
+            <div class="main-grid">
+                <!-- Left Column: Form and Controls -->
+                <div class="left-column">
+                    <!-- Add Transaction Form -->
+                    <div class="form-card">
+                        <h3 class="section-title">
+                            <i class="fas fa-plus-circle"></i>
+                            Add New Transaction
+                        </h3>
+                        <form id="transaction-form">
+                            <div class="form-group">
+                                <label for="description">Description</label>
+                                <input type="text" id="description" placeholder="e.g., Grocery shopping" required>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="amount">Amount ($)</label>
+                                    <input type="number" id="amount" step="0.01" placeholder="0.00" required>
+                                    <small class="hint">Positive for income, negative for expense</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="category">Category</label>
+                                    <select id="category">
+                                        <option value="general">General</option>
+                                        <option value="salary">Salary</option>
+                                        <option value="food">Food & Dining</option>
+                                        <option value="shopping">Shopping</option>
+                                        <option value="transport">Transportation</option>
+                                        <option value="bills">Bills & Utilities</option>
+                                        <option value="entertainment">Entertainment</option>
+                                        <option value="health">Health</option>
+                                        <option value="education">Education</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-plus"></i>
+                                Add Transaction
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="controls-card">
+                        <div class="controls-row">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="search-input" placeholder="Search transactions...">
+                            </div>
+                            <select id="filter-select" class="filter-select">
+                                <option value="all">All Types</option>
+                                <option value="income">Income Only</option>
+                                <option value="expense">Expense Only</option>
+                            </select>
+                        </div>
+                        <div class="controls-row">
+                            <select id="month-select" class="month-select">
+                                <option value="all">All Months</option>
+                                <!-- Months will be populated by JavaScript -->
+                            </select>
+                            <button id="clear-all" class="btn btn-outline">
+                                <i class="fas fa-trash"></i>
+                                Clear All
+                            </button>
+                            <button id="export-csv" class="btn btn-secondary">
+                                <i class="fas fa-download"></i>
+                                Export CSV
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Transaction List -->
+                    <div class="transactions-card">
+                        <div class="section-header">
+                            <h3 class="section-title">
+                                <i class="fas fa-history"></i>
+                                Transaction History
+                                <span class="count-badge" id="transaction-count">0</span>
+                            </h3>
+                            <div class="empty-message" id="empty-message">
+                                No transactions yet. Add your first transaction above.
+                            </div>
+                        </div>
+                        <div id="transaction-list" class="transaction-list">
+                            <!-- Transactions will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Reports -->
+                <div class="right-column">
+                    <!-- Income vs Expense -->
+                    <div class="report-card">
+                        <h3 class="section-title">
+                            <i class="fas fa-balance-scale"></i>
+                            Income vs Expense
+                        </h3>
+                        <div class="comparison-chart">
+                            <div class="comparison-bars">
+                                <div class="income-bar-container">
+                                    <div class="bar-label">Income</div>
+                                    <div class="bar-bg">
+                                        <div class="bar-fill income-fill" id="income-bar">
+                                            <span class="bar-value" id="income-value">$0</span>
+                                        </div>
+                                    </div>
+                                    <div class="bar-total" id="income-total">$0</div>
+                                </div>
+                                <div class="expense-bar-container">
+                                    <div class="bar-label">Expense</div>
+                                    <div class="bar-bg">
+                                        <div class="bar-fill expense-fill" id="expense-bar">
+                                            <span class="bar-value" id="expense-value">$0</span>
+                                        </div>
+                                    </div>
+                                    <div class="bar-total" id="expense-total">$0</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Monthly Expense Chart -->
+                    <div class="report-card">
+                        <div class="chart-header">
+                            <h3 class="section-title">
+                                <i class="fas fa-chart-bar"></i>
+                                Monthly Expenses
+                            </h3>
+                            <div class="chart-legend">
+                                <div class="legend-item">
+                                    <span class="legend-color expense-color"></span>
+                                    <span>Monthly Expenses</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="monthly-chart" class="monthly-chart">
+                            <div class="chart-container">
+                                <!-- Chart bars will be inserted here -->
+                                <div class="chart-empty" id="chart-empty">
+                                    <i class="fas fa-chart-line"></i>
+                                    <p>No expense data available</p>
+                                </div>
+                            </div>
+                            <div class="chart-axis">
+                                <span>Jan</span>
+                                <span>Feb</span>
+                                <span>Mar</span>
+                                <span>Apr</span>
+                                <span>May</span>
+                                <span>Jun</span>
+                                <span>Jul</span>
+                                <span>Aug</span>
+                                <span>Sep</span>
+                                <span>Oct</span>
+                                <span>Nov</span>
+                                <span>Dec</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="stats-card">
+                        <h3 class="section-title">
+                            <i class="fas fa-chart-line"></i>
+                            Quick Stats
+                        </h3>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="fas fa-calendar-day"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <p class="stat-label">Today</p>
+                                    <p class="stat-value" id="today-stat">$0</p>
+                                </div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="fas fa-calendar-week"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <p class="stat-label">This Week</p>
+                                    <p class="stat-value" id="week-stat">$0</p>
+                                </div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="fas fa-tags"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <p class="stat-label">Top Category</p>
+                                    <p class="stat-value" id="category-stat">-</p>
+                                </div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="fas fa-chart-pie"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <p class="stat-label">Avg/Month</p>
+                                    <p class="stat-value" id="avg-stat">$0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>© <span id="current-year"></span> Expense Tracker. All data stored locally.</p>
+            <p class="footer-note">Built with HTML, CSS & Vanilla JavaScript</p>
+        </footer>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Transaction</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="edit-form">
+                <div class="form-group">
+                    <label for="edit-description">Description</label>
+                    <input type="text" id="edit-description" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-amount">Amount ($)</label>
+                        <input type="number" id="edit-amount" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-category">Category</label>
+                        <select id="edit-category">
+                            <option value="general">General</option>
+                            <option value="salary">Salary</option>
+                            <option value="food">Food & Dining</option>
+                            <option value="shopping">Shopping</option>
+                            <option value="transport">Transportation</option>
+                            <option value="bills">Bills & Utilities</option>
+                            <option value="entertainment">Entertainment</option>
+                            <option value="health">Health</option>
+                            <option value="education">Education</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="edit-date">Date</label>
+                    <input type="date" id="edit-date" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="button" class="btn btn-outline modal-close">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
