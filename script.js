@@ -55,6 +55,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Set today's date as default in edit form
         document.getElementById('edit-date').value = now.toISOString().split('T')[0];
         
+        // Set today's date as default in add form
+        document.getElementById('date').value = now.toISOString().split('T')[0];
+        
         // Load and display data
         updateTransactionsDisplay();
         updateSummary();
@@ -98,9 +101,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const description = document.getElementById('description').value.trim();
         const amount = parseFloat(document.getElementById('amount').value);
         const category = document.getElementById('category').value;
+        const date = document.getElementById('date').value;
         
-        if (!description || isNaN(amount)) {
-            alert('Please enter a valid description and amount');
+        if (!description || isNaN(amount) || !date) {
+            alert('Please fill all required fields');
             return;
         }
         
@@ -109,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
             description,
             amount,
             category,
-            date: new Date().toISOString().split('T')[0]
+            date: date
         };
         
         transactions.unshift(newTransaction);
@@ -123,6 +127,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Reset form
         transactionForm.reset();
+        // Set date back to today
+        document.getElementById('date').value = new Date().toISOString().split('T')[0];
         document.getElementById('description').focus();
         
         // Show success message
@@ -337,7 +343,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Fill edit form with transaction data
         document.getElementById('edit-description').value = transaction.description;
-        document.getElementById('edit-amount').value = Math.abs(transaction.amount);
+        document.getElementById('edit-amount').value = transaction.amount;
         document.getElementById('edit-category').value = transaction.category;
         document.getElementById('edit-date').value = transaction.date;
         
@@ -350,25 +356,12 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         
         const description = document.getElementById('edit-description').value.trim();
-        const amountInput = document.getElementById('edit-amount').value;
+        const amount = parseFloat(document.getElementById('edit-amount').value);
         const category = document.getElementById('edit-category').value;
         const date = document.getElementById('edit-date').value;
         
-        if (!description || !amountInput || !date) {
+        if (!description || isNaN(amount) || !date) {
             alert('Please fill all fields correctly');
-            return;
-        }
-        
-        let amount = parseFloat(amountInput);
-        const originalTransaction = transactions.find(t => t.id === editingTransactionId);
-        
-        // Preserve the sign of the original transaction
-        if (originalTransaction.amount < 0 && amount > 0) {
-            amount = -amount;
-        }
-        
-        if (isNaN(amount)) {
-            alert('Please enter a valid amount');
             return;
         }
         
